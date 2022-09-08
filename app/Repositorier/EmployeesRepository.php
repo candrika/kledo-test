@@ -201,7 +201,20 @@ class EmployeesRepository
                     if ($culDuration <= 105) {
                         $duration = '1 jam';
                     } else {
-                        $duration = $culDuration / 60 * 60;
+                        $duration = $culDuration / 60;
+
+                        $arrTime = explode('.', $duration);
+
+                        if ($duration > 1) {
+                            $jam  = $arrTime[0];
+
+                            if (isset($arrTime[1])) {
+                                $menit = ($arrTime[1] * 0.01) * 60;
+                                $timeDuration = $jam . ' Jam ' . $menit . ' Menit';
+                            } else {
+                                $timeDuration = $jam . ' Jam';
+                            }
+                        }
                     }
 
                     $sumDuration += $culDuration;
@@ -210,8 +223,20 @@ class EmployeesRepository
                     $data[$i]['overtime'][$j]['date'] = $ot->date;
                     $data[$i]['overtime'][$j]['time_started'] = $ot->time_started;
                     $data[$i]['overtime'][$j]['time_ended'] = $ot->time_ended;
-                    $data[$i]['overtime'][$j]['duration'] = $duration;
+                    $data[$i]['overtime'][$j]['duration'] = $timeDuration;
                     $j++;
+                }
+
+                $sumTime = $sumDuration / 60;
+                $arrSumTime = explode('.', $sumTime);
+
+                $totalJam = $arrSumTime[0];
+
+                if (isset($arrSumTime[1])) {
+                    $totalMenit = ($arrSumTime[1] * 0.01) * 60;
+                    $totalDuration = $totalJam . ' Jam ' . $totalMenit . ' Menit';
+                } else {
+                    $totalDuration = $totalJam . ' Jam';
                 }
 
                 if ($setting->name == 'Fixed') {
@@ -219,7 +244,7 @@ class EmployeesRepository
                 } elseif ($setting->name == 'Salary / 173') {
                     $amount = ($value->salary / 173) * $sumDuration;
                 }
-                $data[$i]['overtime_duration_total'] = $sumDuration;
+                $data[$i]['overtime_duration_total'] = $totalDuration;
                 $data[$i]['amount'] = $amount;
             } else {
                 $data[$i]['overtime_duration_total'] = 0;
